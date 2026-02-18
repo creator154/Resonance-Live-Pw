@@ -1,0 +1,6 @@
+"engines": {
+  "node": "20.x"  // ya jo version use kar raha
+},
+"scripts": {
+  "start": "node index.js"
+}
