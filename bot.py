@@ -1,4 +1,4 @@
-# bot.py - Telegram Bot for PW Live Link Generator (100% fixed syntax)
+# bot.py - Telegram Bot for PW Live Link Generator (SYNTAX FIXED)
 import os
 import logging
 from telegram import Update
@@ -13,18 +13,18 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Bot token from Heroku config var
+# Bot token from config var
 BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
 if not BOT_TOKEN:
-    logger.error("TELEGRAM_BOT_TOKEN not found in config vars!")
+    logger.error("TELEGRAM_BOT_TOKEN missing in config vars!")
     raise ValueError("TELEGRAM_BOT_TOKEN missing")
 
-# Your player base URL
+# Player base URL
 PLAYER_BASE = "https://creator154.github.io/Resonance-Live-Pw/"
 
-# PW API endpoints (CHANGE THESE TO FRESH FROM ERUDA)
-BATCH_LIST_URL = "https://api.pw.live/v2/batches/my"  # REPLACE WITH FRESH URL
-LIVE_SESSION_URL = "https://api.pw.live/v1/live/{batch_id}/session"  # CONFIRM THIS
+# PW API endpoints (CHANGE TO FRESH FROM ERUDA)
+BATCH_LIST_URL = "https://api.pw.live/v2/batches/my"  # <-- FRESH ENDPOINT DAAL
+LIVE_SESSION_URL = "https://api.pw.live/v1/live/{batch_id}/session"
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(
@@ -51,7 +51,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         r = requests.get(BATCH_LIST_URL, headers=headers, timeout=10)
         r.raise_for_status()
         data = r.json()
-        batches = data.get('data', [])  # change key if needed
+        batches = data.get('data', [])  # CHANGE KEY IF DIFFERENT
 
         if not batches:
             await update.message.reply_text("Koi batch nahi mila. Token check kar.")
