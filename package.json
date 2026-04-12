@@ -1,7 +1,6 @@
 {
   "name": "pw-live-class-server",
   "version": "1.0.0",
-  "description": "Telegram Bot + Live Class Server",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
