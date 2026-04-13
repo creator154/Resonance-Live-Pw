@@ -1,17 +1,7 @@
-{
-  "name": "pw-live-class-server",
-  "version": "1.0.0",
-  "description": "Secure Live Class Server with Telegram Bot",
-  "main": "server.js",
-  "scripts": {
-    "start": "node server.js"
-  },
-  "dependencies": {
-    "axios": "^1.6.0",
-    "dotenv": "^16.4.0",
-    "express": "^4.19.2",
-    "node-telegram-bot-api": "^0.66.0",
-    "jsonwebtoken": "^9.0.2",
-    "crypto-js": "^4.2.0"
-  }
+"dependencies": {
+  "axios": "^1.6.0",
+  "dotenv": "^16.4.0",
+  "express": "^4.19.2",
+  "node-telegram-bot-api": "^0.66.0",
+  "jsonwebtoken": "^9.0.2"
 }
