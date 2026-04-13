@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const axios = require('axios');
+const jwt = require('jsonwebtoken');
 const TelegramBot = require('node-telegram-bot-api');
 
 const app = express();
@@ -8,13 +9,20 @@ const activeLinks = new Map();
 
 const TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const HEROKU_URL = `https://${process.env.HEROKU_APP_NAME}.herokuapp.com`;
+const JWT_SECRET = process.env.JWT_SECRET || "secret";
 
 // ===== TELEGRAM BOT =====
 const bot = new TelegramBot(TOKEN);
 
-// Generate link
+// Generate secure link
 bot.onText(/\/generate (.+)/, (msg, match) => {
-  const token = Math.random().toString(36).substring(2);
+  const batchId = match[1].trim();
+
+  const token = jwt.sign(
+    { batchId, time: Date.now() },
+    JWT_SECRET,
+    { expiresIn: '1h' }
+  );
 
   activeLinks.set(token, {
     validTill: Date.now() + 3600000,
@@ -23,7 +31,7 @@ bot.onText(/\/generate (.+)/, (msg, match) => {
 
   const url = `${HEROKU_URL}/live?token=${token}`;
 
-  bot.sendMessage(msg.chat.id, "✅ Link Ready", {
+  bot.sendMessage(msg.chat.id, `✅ Batch: ${batchId}`, {
     reply_markup: {
       inline_keyboard: [[{ text: "▶️ Join Class", url }]]
     }
@@ -38,10 +46,16 @@ app.get('/live', (req, res) => {
     return res.send("❌ Invalid Link");
   }
 
+  try {
+    jwt.verify(token, JWT_SECRET);
+  } catch {
+    return res.send("❌ Token Expired");
+  }
+
   const data = activeLinks.get(token);
 
   if (Date.now() > data.validTill) {
-    return res.send("❌ Expired");
+    return res.send("❌ Link Expired");
   }
 
   if (!data.ip) data.ip = req.ip;
@@ -83,6 +97,16 @@ app.get('/stream', async (req, res) => {
 app.get('/', (req, res) => {
   res.send("✅ Server Running");
 });
+
+// ===== AUTO CLEANUP =====
+setInterval(() => {
+  const now = Date.now();
+  for (let [token, data] of activeLinks) {
+    if (data.validTill < now) {
+      activeLinks.delete(token);
+    }
+  }
+}, 60000);
 
 // ===== START =====
 app.listen(process.env.PORT || 3000, () => {
